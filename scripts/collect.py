@@ -21,6 +21,7 @@ CATEGORIES = {'1482': 'Livros', '1301': 'Arte', '26': 'Top Geral de Programas'}
 REPO = 'https://github.com/prazeres-interrompidos/top-apple-podcasts-prazeres-interrompidos'
 RAW = 'https://raw.githubusercontent.com/prazeres-interrompidos/top-apple-podcasts-prazeres-interrompidos/main/'
 LISBON = ZoneInfo('Europe/Lisbon')
+SCHEDULE_HOURS = (9, 13, 20)
 _gate = threading.Lock()
 _next_request = 0.0
 
@@ -150,6 +151,7 @@ POSITION_FIELDS = {
     'count', 'status', 'quality', 'divergent', 'divergence_note', 'scope_basis',
     'parser_version', 'http_status', 'source_updated_raw', 'observed_at_utc',
     'observed_at_lisbon', 'date',
+    'fallback', 'aggregation', 'selected_observation_id',
 }
 RUN_FIELDS = {
     'id', 'started_at_utc', 'finished_at_utc', 'trigger', 'scheduled_for_lisbon',
@@ -163,7 +165,7 @@ def compact_run(run):
     """Keep this podcast's positions and aggregate collection health only."""
     observations = run.get('observations', [])
     compact = {k: v for k, v in run.items() if k in RUN_FIELDS}
-    compact['retention_policy'] = 'podcast_positions_only_v1'
+    compact['retention_policy'] = run.get('retention_policy', 'podcast_positions_only_v1')
     # Preserve the aggregate counts on repeated builds of an already compact run.
     summary = run.get('collection_summary')
     if summary is None:
@@ -185,8 +187,57 @@ def compact_run(run):
     return compact
 
 
-def save_run(path, run):
-    dump(path, compact_run(run))
+def daily_best(observations):
+    """One best observed rank per Lisbon day/country/category; ties prefer IDs."""
+    best = {}
+    for record in observations:
+        if record.get('apple_id') != APPLE_ID or record.get('source') not in {'apple_ids', 'apple_rss'}:
+            continue
+        if record.get('status') != 'ranked' or type(record.get('rank')) is not int or record['rank'] < 1:
+            continue
+        if not re.fullmatch('[a-z]{2}', record.get('country', '')) or record.get('category') not in CATEGORIES:
+            continue
+        try:
+            date = dt.date.fromisoformat(record.get('date', '')).isoformat()
+        except (ValueError, TypeError):
+            continue
+        key = (date, record['country'], record['category'])
+        order = lambda r: (r['rank'], r['source'] != 'apple_ids', r.get('observed_at_utc', ''), r.get('id', ''))
+        if key not in best or order(record) < order(best[key]):
+            best[key] = record
+    result = []
+    for (date, country, category), record in sorted(best.items()):
+        selected = {k: v for k, v in record.items() if k in POSITION_FIELDS}
+        selected['selected_observation_id'] = record.get('selected_observation_id', record['id'])
+        selected.update(id=f'daily:{date}:{country}:{category}', aggregation='minimum_observed_rank')
+        result.append(selected)
+    return result
+
+
+def update_daily_archive(root, observations):
+    by_date = {}
+    for record in daily_best(observations):
+        by_date.setdefault(record['date'], []).append(record)
+    for date, positions in by_date.items():
+        path = root / 'archive/daily' / date[:4] / (date + '.json')
+        existing = json.loads(path.read_text())['observations'] if path.exists() else []
+        dump(path, {'date': date, 'timezone': 'Europe/Lisbon', 'retention_policy': 'daily_best_positions_v1',
+                    'observations': daily_best(existing + positions)})
+
+
+def save_run(path, run, root=ROOT):
+    compact = compact_run(run)
+    if compact['retention_policy'] == 'daily_best_positions_v1':
+        if run.get('scope') != 'diagnostic':
+            update_daily_archive(root, compact['observations'])
+        # New run files contain collection counters, never intermediate positions.
+        compact['observations'] = []
+    dump(path, compact)
+
+
+def fallback_jobs(observations):
+    return sorted({(r['country'], r['category']) for r in observations
+                   if r['source'] == 'apple_ids' and r['status'] in {'error', 'empty'}})
 
 
 def mark_divergences(observations):
@@ -206,10 +257,9 @@ def mark_divergences(observations):
 
 def expected_slot(now):
     local = now.astimezone(LISBON)
-    slot = local.replace(hour=13, minute=0, second=0, microsecond=0)
-    if local < slot:
-        slot -= dt.timedelta(days=1)
-    return slot.isoformat()
+    slots = [local.replace(hour=hour, minute=0, second=0, microsecond=0) for hour in SCHEDULE_HOURS]
+    return max([slot for slot in slots if slot <= local] or
+               [slots[-1] - dt.timedelta(days=1)]).isoformat()
 
 
 def allowed_public_record(record):
@@ -229,20 +279,28 @@ def build_public(root=ROOT):
     historic = json.loads((root / 'archive/historical/history.json').read_text())
     runs = []
     ranked = [r for r in historic if allowed_public_record(r)]
+    automatic = []
     latest_run = None
     for path in sorted((root / 'archive/runs').glob('*/*.json')):
         run = compact_run(json.loads(path.read_text()))
         observations = run['observations']
-        for r in observations:
-            if r.get('rank') is not None:
-                ranked.append(r)
+        if run.get('scope') != 'diagnostic':
+            automatic.extend(observations)
         runs.append({k: v for k, v in run.items() if k != 'observations'})
         if run.get('scope') != 'diagnostic' and (not latest_run or run['started_at_utc'] > latest_run['started_at_utc']):
             latest_run = run
+    for path in sorted((root / 'archive/daily').glob('*/*.json')):
+        automatic.extend(json.loads(path.read_text())['observations'])
+    best = daily_best(automatic)
+    ranked.extend(best)
+    if latest_run:
+        latest_date = dt.datetime.fromisoformat(latest_run['started_at_utc']).astimezone(LISBON).date().isoformat()
+        latest_run = dict(latest_run, observations=[r for r in best if r['date'] == latest_date])
     public = root / 'public'
     dump(public / 'history.json', ranked)
     dump(public / 'runs.json', sorted(runs, key=lambda x: x['started_at_utc'], reverse=True))
-    dump(public / 'latest.json', {'schema_version': 2, 'apple_id': APPLE_ID, 'schedule': config['schedule'],
+    dump(public / 'latest.json', {'schema_version': 3, 'apple_id': APPLE_ID, 'schedule': config['schedule'],
+                                'aggregation': 'best_daily_by_country_category',
                                 'run': latest_run, 'repository': REPO, 'raw_base': RAW,
                                 'built_at_utc': utcnow()})
     dump(public / 'countries.json', config['countries'])
@@ -272,7 +330,8 @@ def main():
     run = {'id': run_id, 'started_at_utc': start, 'trigger': trigger,
            'scheduled_for_lisbon': expected_slot(dt.datetime.fromisoformat(start)) if trigger == 'schedule' else None,
            'workflow_url': os.environ.get('MONITOR_RUN_URL'), 'coverage_expected': len(chosen) * 3,
-           'coverage_market_count': len(chosen), 'observations': [], 'status': 'running', 'scope': 'diagnostic' if args.only else 'global'}
+           'coverage_market_count': len(chosen), 'observations': [], 'status': 'running',
+           'retention_policy': 'daily_best_positions_v1', 'scope': 'diagnostic' if args.only else 'global'}
     run_path = ROOT / 'archive/runs' / start[:4] / (run_id + '.json')
     jobs = [(c, g, 'apple_ids') for c in chosen for g in CATEGORIES]
     with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
@@ -282,13 +341,14 @@ def main():
             if len(run['observations']) % 30 == 0:
                 save_run(run_path, run)
                 print(f"Mercados: {len(run['observations'])}/{len(jobs)} respostas", flush=True)
-    fallback = set(config['rss_priority_markets']) & set(chosen)
-    fallback.update(r['country'] for r in run['observations'] if r['status'] in ['ranked', 'error', 'empty'])
+    fallback = fallback_jobs(run['observations'])
     with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
         futures = [pool.submit(fetch_observation, c, g, 'apple_rss', run_id, countries)
-                   for c in sorted(fallback) for g in CATEGORIES]
+                   for c, g in fallback]
         for future in concurrent.futures.as_completed(futures):
-            run['observations'].append(future.result())
+            record = future.result()
+            record['fallback'] = True
+            run['observations'].append(record)
     mark_divergences(run['observations'])
     run['finished_at_utc'] = utcnow()
     run['errors'] = sum(r['status'] == 'error' for r in run['observations'])

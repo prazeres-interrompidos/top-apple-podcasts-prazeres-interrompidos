@@ -1,7 +1,7 @@
-name: Monitorização diária Apple Podcasts
+name: Monitorização Apple Podcasts três vezes por dia
 on:
   schedule:
-    - cron: '0 13 * * *'
+    - cron: '0 9,13,20 * * *'
       timezone: Europe/Lisbon
   workflow_dispatch:
 permissions:
@@ -35,7 +35,7 @@ jobs:
           git config user.email 'monitor@users.noreply.github.com'
           git add archive public
           if ! git diff --cached --quiet; then
-            git commit -m "Registar observação diária Apple Podcasts"
+            git commit -m "Atualizar melhor classificação diária Apple Podcasts"
             git push
           fi
 

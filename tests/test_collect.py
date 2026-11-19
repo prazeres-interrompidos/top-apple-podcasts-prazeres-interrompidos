@@ -12,6 +12,95 @@ spec.loader.exec_module(c)
 
 
 class ChartTests(unittest.TestCase):
+    @staticmethod
+    def observation(rank, date='2026-11-19', country='pt', category='1482', source='apple_ids', suffix='morning'):
+        return {'id': suffix + ':' + country + ':' + category + ':' + source, 'run_id': suffix,
+                'apple_id': c.APPLE_ID, 'country': country, 'category': category,
+                'date': date, 'rank': rank, 'status': 'ranked', 'source': source,
+                'url': c.source_url(country, category, source), 'quality': 'comprovado_na_lista'}
+
+    def test_three_checks_retain_only_the_daily_best_and_keep_failures_honest(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            path = root / 'archive/runs/2026/run.json'
+            run = {'id': 'run', 'scope': 'global', 'status': 'completed',
+                   'retention_policy': 'daily_best_positions_v1'}
+            for rank, slot in [(8, 'morning'), (3, 'afternoon'), (6, 'evening')]:
+                run['observations'] = [self.observation(rank, suffix=slot)]
+                c.save_run(path, run, root)
+            # An error at a later check cannot erase or turn the result into zero.
+            run.update(status='partial', errors=1, observations=[
+                {'apple_id': c.APPLE_ID, 'country': 'pt', 'category': '1482',
+                 'source': 'apple_ids', 'status': 'error', 'rank': None}])
+            c.save_run(path, run, root)
+            daily = json.loads((root / 'archive/daily/2026/2026-11-19.json').read_text())
+            self.assertEqual(len(daily['observations']), 1)
+            self.assertEqual(daily['observations'][0]['rank'], 3)
+            self.assertEqual(daily['observations'][0]['selected_observation_id'], 'afternoon:pt:1482:apple_ids')
+            summary = json.loads(path.read_text())
+            self.assertEqual(summary['observations'], [])
+            self.assertEqual(summary['collection_summary']['apple_ids']['error'], 1)
+            self.assertEqual(summary['status'], 'partial')
+
+    def test_daily_best_separates_dates_countries_categories_and_prefers_ids_on_ties(self):
+        rows = [self.observation(3, source='apple_rss'), self.observation(3),
+                self.observation(10, date='2026-11-20'), self.observation(1, country='mz'),
+                self.observation(5, category='1301')]
+        selected = c.daily_best(rows)
+        self.assertEqual(len(selected), 4)
+        portugal_books = next(r for r in selected if r['date'] == '2026-11-19' and r['country'] == 'pt' and r['category'] == '1482')
+        self.assertEqual(portugal_books['source'], 'apple_ids')
+        self.assertTrue(all(r['aggregation'] == 'minimum_observed_rank' for r in selected))
+        self.assertEqual(c.daily_best(selected), selected)
+
+    def test_rss_fallback_is_per_failed_category_and_never_for_valid_absence(self):
+        rows = [{'source': 'apple_ids', 'country': 'pt', 'category': category, 'status': status}
+                for category, status in [('1482', 'ranked'), ('1301', 'not_found'), ('26', 'error')]]
+        rows.append({'source': 'apple_ids', 'country': 'mz', 'category': '1482', 'status': 'empty'})
+        self.assertEqual(c.fallback_jobs(rows), [('mz', '1482'), ('pt', '26')])
+
+    def test_diagnostic_run_cannot_modify_the_daily_archive(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            run = {'id': 'diagnostic', 'scope': 'diagnostic', 'retention_policy': 'daily_best_positions_v1',
+                   'observations': [self.observation(1)]}
+            path = root / 'archive/runs/2026/test.json'
+            c.save_run(path, run, root)
+            self.assertFalse((root / 'archive/daily').exists())
+            self.assertEqual(json.loads(path.read_text())['observations'], [])
+
+    def test_schedule_slots_cover_three_lisbon_times_and_daylight_saving(self):
+        for hour in [9, 13, 20]:
+            for month, offset in [(7, 1), (11, 0)]:
+                now = dt.datetime(2026, month, 19, hour-offset, 15, tzinfo=dt.timezone.utc)
+                slot = dt.datetime.fromisoformat(c.expected_slot(now))
+                self.assertEqual(slot.hour, hour)
+                self.assertEqual(slot.utcoffset(), dt.timedelta(hours=offset))
+        before_first = dt.datetime(2026, 11, 19, 8, 59, tzinfo=dt.timezone.utc)
+        self.assertEqual(c.expected_slot(before_first), '2026-11-18T20:00:00+00:00')
+
+    def test_public_history_keeps_original_historical_rows_and_aggregates_automatic_rows(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            historical = root / 'archive/historical'
+            historical.mkdir(parents=True)
+            original = [{'id': 'historic-2023', 'source': 'historical', 'source_name': 'Arquivo histórico',
+                         'date': '2023-01-09', 'country': 'pt', 'category': None, 'rank': 2}]
+            c.dump(historical / 'history.json', original)
+            c.dump(historical / 'consultations.json', [])
+            c.dump(historical / 'peaks.json', [{'id': 'peak-2024', 'rank': 2, 'country': 'pt', 'last_charted_date': '2024-12-10'}])
+            c.dump(root / 'config.json', {'countries': [], 'schedule': {'times': ['09:00', '13:00', '20:00']}})
+            run = {'id': 'run', 'scope': 'global', 'started_at_utc': '2026-11-19T13:00:00+00:00',
+                   'observations': [self.observation(8), self.observation(3, suffix='afternoon')]}
+            c.dump(root / 'archive/runs/2026/legacy.json', run)
+            c.build_public(root)
+            result = json.loads((root / 'public/history.json').read_text())
+            self.assertEqual(result[0], original[0])
+            self.assertEqual(len(result), 2)
+            self.assertEqual(result[1]['rank'], 3)
+            self.assertEqual(json.loads((historical / 'history.json').read_text()), original)
+            self.assertEqual(len(json.loads((root / 'public/peaks.json').read_text())), 1)
+
     def test_network_responses_are_never_written_to_disk(self):
         class Response:
             status = 200

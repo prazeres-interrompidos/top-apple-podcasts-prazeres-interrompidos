@@ -1,9 +1,14 @@
 {
   "apple_id": "1633619845",
   "schedule": {
-    "cron": "0 13 * * *",
+    "cron": "0 9,13,20 * * *",
     "timezone": "Europe/Lisbon",
-    "label": "Todos os dias, às 13h00 de Lisboa"
+    "times": [
+      "09:00",
+      "13:00",
+      "20:00"
+    ],
+    "label": "Todos os dias, às 09h00, 13h00 e 20h00 de Lisboa"
   },
   "countries": [
     {
@@ -703,34 +708,14 @@
       "name": "Zimbabwe"
     }
   ],
-  "rss_priority_markets": [
-    "pt",
-    "br",
-    "ao",
-    "mz",
-    "cv",
-    "es",
-    "fr",
-    "gb",
-    "us",
-    "ca",
-    "de",
-    "be",
-    "ch",
-    "nl",
-    "lu",
-    "it",
-    "ie",
-    "au",
-    "za",
-    "dk",
-    "hk",
-    "mo",
-    "my",
-    "np",
-    "no",
-    "ru",
-    "gw",
-    "st"
-  ]
+  "collection_policy": {
+    "primary_source": "apple_ids",
+    "fallback_source": "apple_rss",
+    "fallback_on": [
+      "error",
+      "empty"
+    ],
+    "retention": "daily_best_positions_v1",
+    "aggregation": "best_daily_by_country_category"
+  }
 }
