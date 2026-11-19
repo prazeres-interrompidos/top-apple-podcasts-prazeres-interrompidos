@@ -1,0 +1,62 @@
+[
+  {
+    "id": "20261118T192237-78e8af",
+    "started_at_utc": "2026-11-18T19:22:37.158695+00:00",
+    "trigger": "workflow_dispatch",
+    "scheduled_for_lisbon": null,
+    "workflow_url": "https://github.com/prazeres-interrompidos/top-apple-podcasts-prazeres-interrompidos/actions/runs/44379835332",
+    "coverage_expected": 522,
+    "coverage_market_count": 174,
+    "status": "partial",
+    "scope": "global",
+    "finished_at_utc": "2026-11-18T19:27:40.495994+00:00",
+    "errors": 0,
+    "empty_lists": 2,
+    "ranked_observations": 6,
+    "retention_policy": "podcast_positions_only_v1",
+    "collection_summary": {
+      "apple_ids": {
+        "checked": 522,
+        "ranked": 3,
+        "not_found": 518,
+        "empty": 1,
+        "error": 0
+      },
+      "apple_rss": {
+        "checked": 84,
+        "ranked": 3,
+        "not_found": 80,
+        "empty": 1,
+        "error": 0
+      }
+    }
+  },
+  {
+    "id": "20261118T184515-323c8b",
+    "started_at_utc": "2026-11-18T18:45:15.983138+00:00",
+    "trigger": "manual_local",
+    "scheduled_for_lisbon": null,
+    "workflow_url": null,
+    "coverage_expected": 522,
+    "coverage_market_count": 31,
+    "status": "partial",
+    "scope": "global",
+    "finished_at_utc": "2026-11-18T18:46:42.100953+00:00",
+    "uncollected_count": 432,
+    "coverage_planned_market_count": 174,
+    "interruption_note": "Recolha local interrompida: autorização de rede cancelada antes de decisão. Preservadas as respostas concluídas; sem inferir resultados dos mercados restantes.",
+    "errors": 0,
+    "empty_lists": 0,
+    "ranked_observations": 3,
+    "retention_policy": "podcast_positions_only_v1",
+    "collection_summary": {
+      "apple_ids": {
+        "checked": 90,
+        "ranked": 3,
+        "not_found": 87,
+        "empty": 0,
+        "error": 0
+      }
+    }
+  }
+]

@@ -1,0 +1,192 @@
+[
+  {
+    "id": "pico-1",
+    "country": "ao",
+    "category": "1482",
+    "rank": 29,
+    "last_charted_date": "2024-07-09",
+    "peak_date": null,
+    "source_name": "Arquivo histórico do projeto",
+    "notes": "Pico histórico; a data indicada é a última entrada, não necessariamente o dia do pico."
+  },
+  {
+    "id": "pico-2",
+    "country": "au",
+    "category": "1482",
+    "rank": 109,
+    "last_charted_date": "2023-12-06",
+    "peak_date": null,
+    "source_name": "Arquivo histórico do projeto",
+    "notes": "Pico histórico; a data refere-se à última presença registada."
+  },
+  {
+    "id": "pico-3",
+    "country": "br",
+    "category": "1482",
+    "rank": 81,
+    "last_charted_date": "2024-11-23",
+    "peak_date": null,
+    "source_name": "Arquivo histórico do projeto",
+    "notes": "Pico histórico; a data refere-se à última presença registada."
+  },
+  {
+    "id": "pico-4",
+    "country": "hk",
+    "category": "1482",
+    "rank": 198,
+    "last_charted_date": "2024-06-15",
+    "peak_date": null,
+    "source_name": "Arquivo histórico do projeto",
+    "notes": "Pico histórico; a data refere-se à última presença registada."
+  },
+  {
+    "id": "pico-5",
+    "country": "it",
+    "category": "1482",
+    "rank": 210,
+    "last_charted_date": "2023-04-18",
+    "peak_date": null,
+    "source_name": "Arquivo histórico do projeto",
+    "notes": "Pico histórico; a data refere-se à última presença registada."
+  },
+  {
+    "id": "pico-6",
+    "country": "my",
+    "category": "1482",
+    "rank": 139,
+    "last_charted_date": "2023-08-30",
+    "peak_date": null,
+    "source_name": "Arquivo histórico do projeto",
+    "notes": "Pico histórico; a data refere-se à última presença registada."
+  },
+  {
+    "id": "pico-7",
+    "country": "mz",
+    "category": "1482",
+    "rank": 1,
+    "last_charted_date": "2023-09-13",
+    "peak_date": null,
+    "source_name": "Arquivo histórico do projeto",
+    "notes": "Data do pico também comprovada por gráfico: 14/06/2023."
+  },
+  {
+    "id": "pico-8",
+    "country": "np",
+    "category": "1482",
+    "rank": 20,
+    "last_charted_date": "2024-10-17",
+    "peak_date": null,
+    "source_name": "Arquivo histórico do projeto",
+    "notes": "Pico histórico; a data refere-se à última presença registada."
+  },
+  {
+    "id": "pico-9",
+    "country": "no",
+    "category": "1482",
+    "rank": 219,
+    "last_charted_date": "2023-04-30",
+    "peak_date": null,
+    "source_name": "Arquivo histórico do projeto",
+    "notes": "Pico histórico; a data refere-se à última presença registada."
+  },
+  {
+    "id": "pico-10",
+    "country": "pt",
+    "category": "1482",
+    "rank": 2,
+    "last_charted_date": "2024-12-10",
+    "peak_date": null,
+    "source_name": "Arquivo histórico do projeto",
+    "notes": "Fotografia histórica tirada antes dos primeiros lugares de 2025."
+  },
+  {
+    "id": "pico-11",
+    "country": "ru",
+    "category": "1482",
+    "rank": 228,
+    "last_charted_date": "2023-02-18",
+    "peak_date": null,
+    "source_name": "Arquivo histórico do projeto",
+    "notes": "Pico histórico; a data refere-se à última presença registada."
+  },
+  {
+    "id": "pico-12",
+    "country": "pt",
+    "category": "1482",
+    "rank": 2,
+    "last_charted_date": "2023-01-24",
+    "peak_date": null,
+    "source_name": "Arquivo histórico do projeto",
+    "notes": "Gráfico parcial de 25/12/2022 a 25/01/2023."
+  },
+  {
+    "id": "pico-13",
+    "country": "pt",
+    "category": "1482",
+    "rank": 2,
+    "last_charted_date": "2023-01-09",
+    "peak_date": null,
+    "source_name": "Arquivo histórico do projeto",
+    "notes": "Pico histórico; a data refere-se à última presença registada."
+  },
+  {
+    "id": "pico-14",
+    "country": "pt",
+    "category": "1482",
+    "rank": 2,
+    "last_charted_date": "2022-11-18",
+    "peak_date": null,
+    "source_name": "Arquivo histórico do projeto",
+    "notes": "Pico histórico; a data refere-se à última presença registada."
+  },
+  {
+    "id": "pico-15",
+    "country": "pt",
+    "category": "1301",
+    "rank": 6,
+    "last_charted_date": "2023-01-07",
+    "peak_date": null,
+    "source_name": "Arquivo histórico do projeto",
+    "notes": "Pico histórico; a data refere-se à última presença registada."
+  },
+  {
+    "id": "pico-16",
+    "country": "pt",
+    "category": "26",
+    "rank": 235,
+    "last_charted_date": "2022-11-14",
+    "peak_date": null,
+    "source_name": "Arquivo histórico do projeto",
+    "notes": "Pico histórico até 14/11/2022, não o recorde global do programa."
+  },
+  {
+    "id": "pico-17",
+    "country": "pt",
+    "category": "26",
+    "rank": 174,
+    "last_charted_date": "2022-12-13",
+    "peak_date": null,
+    "source_name": "Arquivo histórico do projeto",
+    "notes": "Pico histórico até 13/12/2022; há registos posteriores melhores."
+  },
+  {
+    "id": "pico-18",
+    "country": "pt",
+    "category": "26",
+    "rank": 161,
+    "last_charted_date": "2023-01-07",
+    "peak_date": null,
+    "source_name": "Arquivo histórico do projeto",
+    "notes": "O gráfico mostra datas de 2022 e janeiro de 2023, apesar do nome incorreto."
+  },
+  {
+    "id": "pico-19",
+    "country": "pt",
+    "category": "1301",
+    "rank": 4,
+    "last_charted_date": null,
+    "peak_date": null,
+    "source_name": "Arquivo histórico do projeto",
+    "notes": "A captura mostra o 4.º lugar, mas não contém data legível. Não entra na cronologia."
+  }
+]

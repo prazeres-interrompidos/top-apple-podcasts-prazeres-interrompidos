@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prazeres Interrompidos · Observatório Apple Podcasts</title>
+<meta name="description" content="Classificações Apple Podcasts do Prazeres Interrompidos. Portugal, rankings internacionais e arquivo histórico documentado.">
+<link rel="stylesheet" href="style.css"><script src="app.js" defer></script>
+</head>
+<body>
+<aside class="sidebar">
+<a class="brand" href="#overview"><span class="brand-icon" aria-hidden="true">◖</span><span>Prazeres<br>Interrompidos<small>OBSERVATÓRIO DO PODCAST</small></span></a>
+<div class="side-label">CLASSIFICAÇÕES APPLE PODCASTS</div>
+<nav aria-label="Navegação"><a href="#overview" class="active">Visão geral <span>›</span></a><a href="#evolution">Evolução histórica</a><a href="#international">Mercados internacionais</a><a href="#history">Registos e fontes</a></nav>
+<div class="sidebar-bottom"><div class="live-dot"></div> Recolha diária · 13h00<small>Hora de Lisboa · Europe/Lisbon</small></div>
+</aside>
+<main>
+<header class="topbar"><span>O mundo dos livros, em números.</span><div><span id="sync-status" role="status">A carregar o arquivo…</span><button id="refresh" class="button small">↻ Atualizar dados</button></div></header>
+<section id="overview" class="intro">
+<div class="eyebrow">PRAZERES INTERROMPIDOS / APPLE PODCASTS</div>
+<div class="intro-row"><div><h1>Classificações Apple Podcasts.<br><em>Portugal e o mundo.</em></h1><p>Acompanha as classificações do podcast em Portugal e no mundo.<br>Observações datadas, fontes identificadas e histórico preservado.</p></div></div>
+<div class="notice" id="notice" role="status" hidden></div>
+<div class="section-title"><h2>Portugal, na última recolha</h2><span id="last-observation">A consultar o arquivo</span></div>
+<div class="rank-grid" id="rank-grid"></div>
+<p class="caption">A posição corresponde à lista recebida nessa consulta. As fontes Apple podem atualizar em momentos diferentes. Uma ausência refere-se apenas à profundidade consultada.</p>
+<div class="metrics" id="metrics"></div>
+</section>
+<section class="section chart-section" id="evolution">
+<div class="section-title"><div><div class="eyebrow">O PERCURSO DO PODCAST</div><h2>Evolução das classificações</h2></div><button id="export" class="button">↓ Exportar seleção</button></div>
+<div class="filterbar"><label>País ou região<select id="country"><option value="pt">Portugal</option></select></label><label>Categoria<select id="category"><option value="1482">Livros</option><option value="1301">Arte</option><option value="26">Top Geral de Programas</option><option value="">Todas</option></select></label><label>Fonte<select id="source"><option value="">Todos os registos</option><option value="apple_ids">Apple · lista de IDs</option><option value="apple_rss">Apple · RSS</option><option value="historical">Registos fornecidos</option></select></label><label>Período<select id="period"><option value="all">Todo o arquivo</option><option value="30">Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="365">Último ano</option></select></label></div>
+<div class="chart-top"><div><strong id="chart-summary">A carregar…</strong><span id="chart-subtitle"></span></div><div class="legend"><span class="legend-historical">Registos fornecidos</span><span class="legend-ids">Apple · IDs</span><span class="legend-rss">Apple · RSS</span></div></div>
+<div id="chart" class="chart" aria-label="Gráfico de posições observadas"></div>
+<p class="caption">1.º lugar no topo. Os pontos representam observações; os intervalos sem dados não são preenchidos. As fontes mantêm séries separadas. Os pontos do arquivo podem ter apenas a data, sem hora conhecida.</p>
+</section>
+<section class="section" id="international">
+<div class="section-title"><div><div class="eyebrow">UM PODCAST, VÁRIOS MERCADOS</div><h2>Países com registos</h2></div><label class="inline-check"><input type="checkbox" id="only-ranked" checked> Apenas posições encontradas</label></div>
+<p class="section-desc">Clica numa bandeira para consultar as posições registadas nesse país ou região. Os novos países surgem automaticamente quando é encontrada uma posição.</p><div id="country-flags" class="country-flags" aria-label="Países e regiões com posições registadas"></div><div class="section-title current-world-title"><h3>Última recolha Apple</h3></div><p class="section-desc" id="coverage-summary"></p>
+<div class="table-wrap"><table><thead><tr><th>País ou região</th><th>Livros</th><th>Arte</th><th>Geral</th><th>Consulta</th></tr></thead><tbody id="world-body"></tbody></table></div><p id="world-empty" class="empty" hidden>Nenhuma posição encontrada nesta seleção. Desmarca o filtro para consultar todos os mercados e os estados das consultas.</p>
+</section>
+<section class="section" id="history">
+<div class="section-title"><div><div class="eyebrow">UM REGISTO, UMA ORIGEM</div><h2>Histórico e fontes</h2></div><span class="count" id="history-count"></span></div>
+<div class="history-tools"><input id="search" type="search" placeholder="Pesquisar uma data, fonte ou observação…" aria-label="Pesquisar registos"><label class="inline-check"><input type="checkbox" id="divergences"> Só divergências</label></div>
+<div class="table-wrap"><table><thead><tr><th>Data da observação</th><th>País</th><th>Categoria</th><th>Posição</th><th>Fonte / comprovação</th><th></th></tr></thead><tbody id="history-body"></tbody></table></div>
+<div class="pagination"><span id="page-summary"></span><div><button id="prev" class="button small">← Anterior</button><button id="next" class="button small">Seguinte →</button></div></div>
+<details class="audit"><summary>Consultas históricas e resultados não verificáveis <span id="query-count"></span></summary><p>Estas consultas a fontes Apple mantêm o resultado original. Não são convertidas automaticamente em posições comprovadas.</p><div id="queries"></div></details>
+</section>
+
+<section class="section" id="historical-peaks"><details class="audit"><summary>Posições apresentadas em registos históricos sem data do pico</summary><p>Os valores são preservados como referências históricas. A última presença indicada não corresponde necessariamente ao dia em que foi alcançada a melhor posição.</p><div id="peaks"></div></details></section>
+<section class="section methods">
+<div><div class="eyebrow">COMO LER OS DADOS</div><h2>O rigor também<br>está nas reservas.</h2></div>
+<div><p><b>Comprovado na lista</b> · O ID do programa está na resposta oficial arquivada.</p><p><b>Histórico</b> · Classificação fornecida pelo projeto, com o seu estado de validação. As fontes de consulta automática são exclusivamente da Apple.</p><p><b>Divergente</b> · Há observações diferentes que devem ser lidas com as respetivas fontes e horas.</p><p><b>Não verificável</b> · A consulta falhou, a lista está vazia ou faltam campos necessários.</p><p class="caption">Os tops medem popularidade e envolvimento. Não são contagens de ouvintes. As classificações internacionais são de cada mercado; não constituem um top mundial.</p></div>
+</section>
+<footer><span>Prazeres Interrompidos<br><small>Projeto Internacional de Promoção da Leitura, dos Livros e dos Escritores</small></span><a href="https://podcasts.apple.com/pt/podcast/prazeres-interrompidos/id1633619845" target="_blank" rel="noopener">Ouvir na Apple Podcasts</a></footer>
+</main>
+<dialog id="detail"><button class="close" aria-label="Fechar">×</button><div id="detail-content"></div></dialog>
+</body></html>

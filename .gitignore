@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+artifacts/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.pdf
+*.xlsx
+*.zip
+archive/documents/
+archive/originals/
+archive/responses/
