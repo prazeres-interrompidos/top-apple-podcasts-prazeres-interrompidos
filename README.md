@@ -1,6 +1,6 @@
 # Prazeres Interrompidos · Dados Apple Podcasts
 
-Consultas às 09h00, 13h00 e 20h00 de Lisboa, num repositório público gratuito, com ajuste automático da hora de verão.
+Consultas às 06h00, 13h00 e 20h00 de Lisboa, num repositório público gratuito, com ajuste automático da hora de verão.
 
 Este repositório contém apenas código e registos de classificações do podcast Prazeres Interrompidos. As listas recebidas da Apple são analisadas em memória e descartadas: não são guardados os outros programas, as respostas completas ou cópias dos feeds. Não contém capturas, cartazes, fotografias, ficheiros Excel originais ou inventários documentais. Os documentos confidenciais permanecem fora deste repositório.
 

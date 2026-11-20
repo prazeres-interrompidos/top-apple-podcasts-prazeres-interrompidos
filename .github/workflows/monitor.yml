@@ -1,7 +1,7 @@
 name: Monitorização Apple Podcasts três vezes por dia
 on:
   schedule:
-    - cron: '0 9,13,20 * * *'
+    - cron: '0 6,13,20 * * *'
       timezone: Europe/Lisbon
   workflow_dispatch:
 permissions:

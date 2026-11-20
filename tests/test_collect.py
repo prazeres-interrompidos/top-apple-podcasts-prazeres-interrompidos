@@ -70,13 +70,13 @@ class ChartTests(unittest.TestCase):
             self.assertEqual(json.loads(path.read_text())['observations'], [])
 
     def test_schedule_slots_cover_three_lisbon_times_and_daylight_saving(self):
-        for hour in [9, 13, 20]:
+        for hour in [6, 13, 20]:
             for month, offset in [(7, 1), (11, 0)]:
                 now = dt.datetime(2026, month, 19, hour-offset, 15, tzinfo=dt.timezone.utc)
                 slot = dt.datetime.fromisoformat(c.expected_slot(now))
                 self.assertEqual(slot.hour, hour)
                 self.assertEqual(slot.utcoffset(), dt.timedelta(hours=offset))
-        before_first = dt.datetime(2026, 11, 19, 8, 59, tzinfo=dt.timezone.utc)
+        before_first = dt.datetime(2026, 11, 19, 5, 59, tzinfo=dt.timezone.utc)
         self.assertEqual(c.expected_slot(before_first), '2026-11-18T20:00:00+00:00')
 
     def test_public_history_keeps_original_historical_rows_and_aggregates_automatic_rows(self):
@@ -89,7 +89,7 @@ class ChartTests(unittest.TestCase):
             c.dump(historical / 'history.json', original)
             c.dump(historical / 'consultations.json', [])
             c.dump(historical / 'peaks.json', [{'id': 'peak-2024', 'rank': 2, 'country': 'pt', 'last_charted_date': '2024-12-10'}])
-            c.dump(root / 'config.json', {'countries': [], 'schedule': {'times': ['09:00', '13:00', '20:00']}})
+            c.dump(root / 'config.json', {'countries': [], 'schedule': {'times': ['06:00', '13:00', '20:00']}})
             run = {'id': 'run', 'scope': 'global', 'started_at_utc': '2026-11-19T13:00:00+00:00',
                    'observations': [self.observation(8), self.observation(3, suffix='afternoon')]}
             c.dump(root / 'archive/runs/2026/legacy.json', run)

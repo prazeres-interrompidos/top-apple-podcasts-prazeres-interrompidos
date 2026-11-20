@@ -2,14 +2,14 @@
   "schema_version": 3,
   "apple_id": "1633619845",
   "schedule": {
-    "cron": "0 9,13,20 * * *",
+    "cron": "0 6,13,20 * * *",
     "timezone": "Europe/Lisbon",
     "times": [
-      "09:00",
+      "06:00",
       "13:00",
       "20:00"
     ],
-    "label": "Todos os dias, às 09h00, 13h00 e 20h00 de Lisboa"
+    "label": "Todos os dias, às 06h00, 13h00 e 20h00 de Lisboa"
   },
   "aggregation": "best_daily_by_country_category",
   "run": {

@@ -21,7 +21,7 @@ CATEGORIES = {'1482': 'Livros', '1301': 'Arte', '26': 'Top Geral de Programas'}
 REPO = 'https://github.com/prazeres-interrompidos/top-apple-podcasts-prazeres-interrompidos'
 RAW = 'https://raw.githubusercontent.com/prazeres-interrompidos/top-apple-podcasts-prazeres-interrompidos/main/'
 LISBON = ZoneInfo('Europe/Lisbon')
-SCHEDULE_HOURS = (9, 13, 20)
+SCHEDULE_HOURS = (6, 13, 20)
 _gate = threading.Lock()
 _next_request = 0.0
 
