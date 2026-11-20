@@ -11,7 +11,7 @@ import threading
 import time
 import urllib.error
 import urllib.request
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit, quote
 import uuid
 from zoneinfo import ZoneInfo
 
@@ -22,6 +22,7 @@ REPO = 'https://github.com/prazeres-interrompidos/top-apple-podcasts-prazeres-in
 RAW = 'https://raw.githubusercontent.com/prazeres-interrompidos/top-apple-podcasts-prazeres-interrompidos/main/'
 LISBON = ZoneInfo('Europe/Lisbon')
 SCHEDULE_HOURS = (6, 13, 20)
+MANUAL_EXPORT = 'https://prazeres-interrompidos-apple-rankings.oct-nuno.chatgpt.site/api/collector/manual-records.json'
 _gate = threading.Lock()
 _next_request = 0.0
 
@@ -225,6 +226,56 @@ def update_daily_archive(root, observations):
                     'observations': daily_best(existing + positions)})
 
 
+def import_manual_records(root=ROOT):
+    """Merge verified one-click Apple positions; never import source response lists."""
+    rows = []
+    cursor = None
+    visited = set()
+    try:
+        for _ in range(5000):
+            request = urllib.request.Request(MANUAL_EXPORT + ('?cursor=' + quote(cursor, safe='') if cursor else ''),
+                                             headers={'User-Agent': 'PrazeresInterrompidos-Monitor/1.0'})
+            with urllib.request.urlopen(request, timeout=30) as response:
+                body = response.read(8_000_001)
+            if len(body) > 8_000_000:
+                raise ValueError('Manual archive response too large')
+            payload = json.loads(body)
+            if payload.get('schema_version') != 1 or not isinstance(payload.get('records'), list) or len(payload['records']) > 20000:
+                raise ValueError('Invalid manual archive schema')
+            for row in payload['records']:
+                if not isinstance(row, dict) or row.get('apple_id') != APPLE_ID or row.get('chart_type') != 'shows':
+                    continue
+                if row.get('source') not in {'apple_ids', 'apple_rss'} or row.get('category') not in CATEGORIES or not re.fullmatch('[a-z]{2}', row.get('country', '')):
+                    continue
+                if row.get('status') != 'ranked' or row.get('quality') != 'comprovado_na_lista' or row.get('divergent') is not False:
+                    continue
+                if type(row.get('rank')) is not int or not 1 <= row['rank'] <= (250 if row['source'] == 'apple_ids' else 200):
+                    continue
+                if row.get('url') != source_url(row['country'], row['category'], row['source']):
+                    continue
+                try:
+                    observed = dt.datetime.fromisoformat(row.get('observed_at_utc', '').replace('Z', '+00:00'))
+                    if observed.tzinfo is None or observed > dt.datetime.now(dt.timezone.utc) or observed.astimezone(LISBON).date().isoformat() != row.get('date'):
+                        continue
+                except (ValueError, TypeError):
+                    continue
+                if not isinstance(row.get('id'), str) or len(row['id']) > 200:
+                    continue
+                rows.append({key: value for key, value in row.items() if key in POSITION_FIELDS})
+            cursor = payload.get('cursor')
+            if cursor is None:
+                update_daily_archive(root, rows)
+                return len(daily_best(rows))
+            if not isinstance(cursor, str) or len(cursor) > 2000 or cursor in visited:
+                raise ValueError('Invalid manual archive cursor')
+            visited.add(cursor)
+        raise ValueError('Manual archive pagination limit')
+    except Exception:
+        # A temporary manual-archive outage cannot erase records or stop the Apple checks.
+        print('Arquivo manual indisponível; os registos existentes foram preservados.', flush=True)
+        return 0
+
+
 def save_run(path, run, root=ROOT):
     compact = compact_run(run)
     if compact['retention_policy'] == 'daily_best_positions_v1':
@@ -322,6 +373,8 @@ def main():
     chosen = list(countries) if not args.only else args.only.lower().split(',')
     if any(c not in countries for c in chosen):
         parser.error('Mercado não catalogado')
+    if not args.only:
+        import_manual_records()
     # Portugal is deliberately first; each market keeps its own actual timestamp.
     chosen.sort(key=lambda c: (c != 'pt', c))
     start = utcnow()

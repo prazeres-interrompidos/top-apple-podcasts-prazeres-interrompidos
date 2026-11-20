@@ -237,6 +237,50 @@ class ChartTests(unittest.TestCase):
         c.mark_divergences([a,b])
         self.assertTrue(a['divergent'])
 
+    def test_manual_positions_are_imported_once_with_best_rank_and_without_response_lists(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            existing = self.observation(3, date='2026-11-20')
+            c.update_daily_archive(root, [existing])
+            manual = self.observation(2, date='2026-11-20', suffix='manual')
+            manual.update(chart_type='shows', divergent=False, observed_at_utc='2026-11-20T08:00:00+00:00',
+                          resultIds=['confidential-other-id'], raw_body='not-to-be-archived')
+            class Response:
+                def __enter__(self): return self
+                def __exit__(self, *args): return False
+                def read(self, limit):
+                    return json.dumps({'schema_version': 1, 'records': [manual], 'cursor': None}).encode()
+            with patch.object(c.urllib.request, 'urlopen', return_value=Response()):
+                self.assertEqual(c.import_manual_records(root), 1)
+                c.import_manual_records(root)
+            saved = (root / 'archive/daily/2026/2026-11-20.json').read_text()
+            rows = json.loads(saved)['observations']
+            self.assertEqual(len(rows), 1)
+            self.assertEqual(rows[0]['rank'], 2)
+            self.assertNotIn('resultIds', saved)
+            self.assertNotIn('raw_body', saved)
+            self.assertNotIn('confidential-other-id', saved)
+
+    def test_unavailable_or_invalid_manual_archive_cannot_erase_existing_records(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            c.update_daily_archive(root, [self.observation(3, date='2026-11-20')])
+            path = root / 'archive/daily/2026/2026-11-20.json'
+            before = path.read_bytes()
+            with patch.object(c.urllib.request, 'urlopen', side_effect=OSError('offline')):
+                self.assertEqual(c.import_manual_records(root), 0)
+            self.assertEqual(path.read_bytes(), before)
+            invalid = self.observation(1, date='2026-11-20')
+            invalid.update(chart_type='shows', divergent=False, observed_at_utc='2026-11-20T08:00:00+00:00', url='https://other.example')
+            class Response:
+                def __enter__(self): return self
+                def __exit__(self, *args): return False
+                def read(self, limit):
+                    return json.dumps({'schema_version': 1, 'records': [invalid], 'cursor': None}).encode()
+            with patch.object(c.urllib.request, 'urlopen', return_value=Response()):
+                self.assertEqual(c.import_manual_records(root), 0)
+            self.assertEqual(path.read_bytes(), before)
+
     def test_lisbon_daylight_saving(self):
         summer = c.expected_slot(dt.datetime(2026,7,3,13,0,tzinfo=dt.timezone.utc))
         winter = c.expected_slot(dt.datetime(2026,11,18,14,0,tzinfo=dt.timezone.utc))
