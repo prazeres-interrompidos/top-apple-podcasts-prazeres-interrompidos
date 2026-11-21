@@ -381,7 +381,7 @@ def main():
     run_id = start[:19].replace(':', '').replace('-', '') + '-' + uuid.uuid4().hex[:6]
     trigger = os.environ.get('MONITOR_TRIGGER', 'manual_local')
     run = {'id': run_id, 'started_at_utc': start, 'trigger': trigger,
-           'scheduled_for_lisbon': expected_slot(dt.datetime.fromisoformat(start)) if trigger == 'schedule' else None,
+           'scheduled_for_lisbon': (os.environ.get('MONITOR_SCHEDULED_FOR') or expected_slot(dt.datetime.fromisoformat(start))) if trigger == 'schedule' else None,
            'workflow_url': os.environ.get('MONITOR_RUN_URL'), 'coverage_expected': len(chosen) * 3,
            'coverage_market_count': len(chosen), 'observations': [], 'status': 'running',
            'retention_policy': 'daily_best_positions_v1', 'scope': 'diagnostic' if args.only else 'global'}
