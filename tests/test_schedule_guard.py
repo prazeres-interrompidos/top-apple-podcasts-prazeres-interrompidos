@@ -73,6 +73,42 @@ class ScheduleGuardTests(unittest.TestCase):
             result = guard.decision(Path(folder), now=summer)
             self.assertEqual(result['slot'], '2027-07-01T06:00:00+01:00')
 
+    def test_a_missing_morning_round_can_be_recovered_after_its_hour(self):
+        with tempfile.TemporaryDirectory() as folder:
+            result = guard.decision(Path(folder), now=self.now.replace(hour=9, minute=17))
+            self.assertTrue(result['collect'])
+            self.assertEqual(result['slot'], '2026-11-21T06:00:00+00:00')
+
+    def test_no_automatic_collection_before_six_even_if_yesterday_is_missing(self):
+        with tempfile.TemporaryDirectory() as folder:
+            for hour in (0, 1, 5):
+                self.assertFalse(guard.decision(Path(folder), now=self.now.replace(hour=hour))['collect'])
+            self.assertTrue(guard.decision(Path(folder), event='workflow_dispatch', now=self.now.replace(hour=1))['collect'])
+
+    def test_a_push_recovery_and_a_scheduled_run_share_the_same_slot(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            self.assertTrue(guard.decision(root, event='push', now=self.now)['collect'])
+            self.save(root, trigger='push')
+            self.assertFalse(guard.decision(root, event='schedule', now=self.now)['collect'])
+            self.assertFalse(guard.decision(root, event='push', now=self.now)['collect'])
+
+    def test_forty_eight_checks_still_collect_only_the_three_daily_slots(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            collected = []
+            for hour in range(24):
+                for minute in (17, 47):
+                    now = self.now.replace(hour=hour, minute=minute)
+                    result = guard.decision(root, now=now)
+                    if result['collect']:
+                        collected.append(result['slot'])
+                        self.save(root, scheduled_for_lisbon=result['slot'],
+                                  finished_at_utc=(now + dt.timedelta(minutes=5)).isoformat())
+            self.assertEqual(collected, ['2026-11-21T06:00:00+00:00',
+                                         '2026-11-21T13:00:00+00:00',
+                                         '2026-11-21T20:00:00+00:00'])
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -3,9 +3,16 @@ on:
   schedule:
     - cron: '0 6,13,20 * * *'
       timezone: Europe/Lisbon
-    # Recovery checks skip Apple entirely once the nominal collection is saved.
-    - cron: '17,47 6,13,20 * * *'
+    # Check throughout the day so a missed collection can still be recovered later.
+    # Completed slots and checks before 06:00 never consult Apple.
+    - cron: '17,47 * * * *'
       timezone: Europe/Lisbon
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/monitor.yml'
+      - 'scripts/**'
+      - 'tests/**'
   workflow_dispatch:
 permissions:
   contents: write

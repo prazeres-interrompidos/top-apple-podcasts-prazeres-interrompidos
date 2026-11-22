@@ -4,20 +4,22 @@ import json
 import os
 from pathlib import Path
 
-from collect import ROOT, expected_slot
+from collect import ROOT, LISBON, expected_slot
 
 
 def decision(root=ROOT, event='schedule', now=None):
-    if event != 'schedule':
+    if event not in {'schedule', 'push'}:
         return {'collect': True, 'slot': '', 'reason': 'Recolha manual solicitada.'}
     now = now or dt.datetime.now(dt.timezone.utc)
     slot = expected_slot(now)
+    if dt.datetime.fromisoformat(slot).date() != now.astimezone(LISBON).date():
+        return {'collect': False, 'slot': '', 'reason': 'Antes das 06h00: ainda não há ronda automática de hoje.'}
     years = {dt.datetime.fromisoformat(slot).year, now.year}
     for year in years:
         for path in sorted((root / 'archive/runs' / str(year)).glob('*.json')):
             try:
                 run = json.loads(path.read_text())
-                if run.get('trigger') != 'schedule' or run.get('scope') != 'global':
+                if run.get('trigger') not in {'schedule', 'push'} or run.get('scope') != 'global':
                     continue
                 if run.get('scheduled_for_lisbon') != slot or run.get('status') not in {'completed', 'partial'}:
                     continue
