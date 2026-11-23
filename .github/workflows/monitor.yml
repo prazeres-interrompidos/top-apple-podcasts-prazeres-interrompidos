@@ -11,6 +11,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/monitor.yml'
+      - 'collection-request.json'
       - 'scripts/**'
       - 'tests/**'
   workflow_dispatch:
