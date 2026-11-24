@@ -13,16 +13,16 @@
   },
   "aggregation": "best_daily_by_country_category",
   "run": {
-    "id": "20261124T130343-58c690",
-    "started_at_utc": "2026-11-24T13:03:43.370943+00:00",
+    "id": "20261124T200658-c24170",
+    "started_at_utc": "2026-11-24T20:06:58.154691+00:00",
     "trigger": "push",
-    "scheduled_for_lisbon": "2026-11-24T13:00:00+00:00",
-    "workflow_url": "https://github.com/prazeres-interrompidos/top-apple-podcasts-prazeres-interrompidos/actions/runs/45399532858",
+    "scheduled_for_lisbon": "2026-11-24T20:00:00+00:00",
+    "workflow_url": "https://github.com/prazeres-interrompidos/top-apple-podcasts-prazeres-interrompidos/actions/runs/45477330192",
     "coverage_expected": 522,
     "coverage_market_count": 174,
     "status": "partial",
     "scope": "global",
-    "finished_at_utc": "2026-11-24T13:08:04.527895+00:00",
+    "finished_at_utc": "2026-11-24T20:11:19.361545+00:00",
     "errors": 0,
     "empty_lists": 2,
     "ranked_observations": 4,
@@ -156,5 +156,5 @@
   },
   "repository": "https://github.com/prazeres-interrompidos/top-apple-podcasts-prazeres-interrompidos",
   "raw_base": "https://raw.githubusercontent.com/prazeres-interrompidos/top-apple-podcasts-prazeres-interrompidos/main/",
-  "built_at_utc": "2026-11-24T13:08:04.534259+00:00"
+  "built_at_utc": "2026-11-24T20:11:19.365512+00:00"
 }
