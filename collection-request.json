@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "scheduled_for_lisbon": "2026-11-25T06:00:00+00:00",
-  "requested_at_utc": "2026-11-25T06:03:23Z",
+  "scheduled_for_lisbon": "2026-11-25T13:00:00+00:00",
+  "requested_at_utc": "2026-11-25T13:04:06Z",
   "requested_by": "chatgpt_schedule"
 }
