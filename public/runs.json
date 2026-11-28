@@ -1,5 +1,37 @@
 [
   {
+    "id": "20261128T130954-0eaa07",
+    "started_at_utc": "2026-11-28T13:09:54.776599+00:00",
+    "trigger": "push",
+    "scheduled_for_lisbon": "2026-11-28T13:00:00+00:00",
+    "workflow_url": "https://github.com/prazeres-interrompidos/top-apple-podcasts-prazeres-interrompidos/actions/runs/46148223392",
+    "coverage_expected": 522,
+    "coverage_market_count": 174,
+    "status": "partial",
+    "scope": "global",
+    "finished_at_utc": "2026-11-28T13:14:15.979810+00:00",
+    "errors": 0,
+    "empty_lists": 2,
+    "ranked_observations": 3,
+    "retention_policy": "daily_best_positions_v1",
+    "collection_summary": {
+      "apple_ids": {
+        "checked": 522,
+        "ranked": 3,
+        "not_found": 518,
+        "empty": 1,
+        "error": 0
+      },
+      "apple_rss": {
+        "checked": 1,
+        "ranked": 0,
+        "not_found": 0,
+        "empty": 1,
+        "error": 0
+      }
+    }
+  },
+  {
     "id": "20261128T060459-5c18a2",
     "started_at_utc": "2026-11-28T06:04:59.506124+00:00",
     "trigger": "push",
